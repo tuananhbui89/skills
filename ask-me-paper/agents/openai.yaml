@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ask Me Paper"
+  short_description: "Quiz papers with rigorous multiple choice"
+  default_prompt: "Use $ask-me-paper to quiz me on this paper with rigorous four-choice multiple-choice questions until we share the same understanding."

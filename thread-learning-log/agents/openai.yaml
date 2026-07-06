@@ -1,0 +1,4 @@
+interface:
+  display_name: "Thread Learning Log"
+  short_description: "Log durable lessons from the current thread"
+  default_prompt: "Use $thread-learning-log to draft a knowledge-first learning entry for this thread, show it for confirmation, and append it to ~/.codex/skills/thread-learning-log/learning-log.md only after approval."

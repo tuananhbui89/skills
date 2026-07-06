@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grill Me"
+  short_description: "Interrogate plans until decisions are clear"
+  default_prompt: "Use $grill-me to pressure-test my plan one decision at a time."
