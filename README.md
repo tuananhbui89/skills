@@ -1,8 +1,14 @@
 # Agent Skills for AI/ML Research Scientists
 
+This repository collects the Codex skills I have used regularly since January 2026 in my work as an AI/ML scientist in industry. Each skill is designed around a specific recurring workflow where a small amount of prompt structure can make an AI agent much more useful.
+
+For example, `thread-learning-log` helps me capture what I learned from a session so that daily work turns into reusable knowledge, more importantly, encourage me to learn something new each day. `grill-me` helps pressure-test a plan or design by surfacing hidden assumptions, unresolved decisions, and likely limitations before implementation begins.
+
+Link to the Github repository: [https://github.com/tuananhbui89/skills]
+
 ## Thread Learning Log
 
-Motivation: I want a lightweight way to track what I actually learn while working with AI agents. Today, agents can support many parts of our work, such as reading papers, planning experiments, writing code, debugging, and running evaluations. As a result, we can accomplish much more in a single day than before.
+**Motivation**: I want a lightweight way to track what I actually learn while working with AI agents. Today, agents can support many parts of our work, such as reading papers, planning experiments, writing code, debugging, and running evaluations. As a result, we can accomplish much more in a single day than before.
 
 But in my own experience, moving faster does not always feel the same as understanding more deeply. It can feel like the difference between walking somewhere and riding in a self-driving car. When I walk, progress is slower and I may stumble, but the obstacles I encounter force me to observe, reason, and solve problems myself. Knowledge is formed through that friction, and it tends to stay in my mind. In a self-driving car, I may travel much farther, but I can lose the embodied sense that I actually learned the route.
 
@@ -100,3 +106,38 @@ It is useful in several moments:
 - after using an AI agent to summarize a paper, to make sure I did not only outsource the understanding
 
 The most valuable behavior is correction. If I choose the wrong answer, the skill should not simply reveal the correct option and move on. It should explain the misconception, point back to the paper's evidence or logic, and ask a targeted follow-up question when the misunderstanding affects later understanding. That turns paper reading into an active loop: commit, get corrected, refine the model, and continue.
+
+## YouTube Transcript
+
+I often learn from YouTube tutorials, talks, and walkthroughs, but many of them are long. A useful video can easily be 30 minutes or more, and my attention usually fades very soon. Therefore, it comes very naturally with the need of a co-study partner: extract the transcript, summarize the structure, and help me decide where to spend my attention.
+
+This skill exists for that workflow. It uses a Python helper built around `youtube-transcript-api` to fetch a transcript from a YouTube URL or video ID, save the transcript in the current workspace, and then produce a concise summary of the video's content. Having the transcript as a local text file is also useful because it turns a video into something searchable, quotable, and easy to revisit later.
+
+**The skill**
+
+The core behavior of `youtube-transcript` is:
+
+- Accept common YouTube URL formats, including normal watch links, `youtu.be` links, Shorts, embeds, live URLs, and playlist URLs that contain a video parameter.
+- Fetch the transcript through `scripts/get_transcript.py`.
+- Save the transcript as a `.txt` file in the current workspace unless another destination is requested.
+- Report useful metadata, including the output path, video ID, transcript language, whether it was auto-generated, and any fallback behavior.
+- Read the saved transcript and summarize the video's main ideas concisely.
+- Clearly explain limitations when transcripts are unavailable, the video is private or restricted, or request blocking prevents extraction.
+
+**Usage**
+
+Use this skill when I have a YouTube video and want to study it more efficiently. A typical prompt is:
+
+```text
+Use $youtube-transcript to fetch the transcript for this video and summarize it: <YouTube URL>
+```
+
+It is useful for:
+
+- long tutorials where I want the main steps before deciding what to watch carefully
+- technical talks where I want the argument, examples, and conclusions in text form
+- coding walkthroughs where I want to search for specific commands, APIs, or design decisions
+- lectures or interviews where I want a compact study note before deeper review
+- saving useful video content into a workspace so it can be referenced by later Codex sessions
+
+The important point is that this skill turns video learning into text-first learning. Once the transcript is saved, I can ask follow-up questions, extract checklists, compare claims, turn the content into notes, or pass the transcript into another skill such as `ask-me-paper` or `thread-learning-log`.
