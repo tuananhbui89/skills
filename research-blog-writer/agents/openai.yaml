@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Blog Writer"
+  short_description: "Write deeply researched technical posts"
+  default_prompt: "Use $research-blog-writer to research this topic from current preferred sources and draft a layered Markdown post with deep engineering detail, inline citations, and references."

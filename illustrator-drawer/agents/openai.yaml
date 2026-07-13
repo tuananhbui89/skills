@@ -1,0 +1,4 @@
+interface:
+  display_name: "Illustrator Drawer"
+  short_description: "Draw accessible explanatory SVG figures"
+  default_prompt: "Use $illustrator-drawer to turn this approved illustration request into an accessible SVG figure."

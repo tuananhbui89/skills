@@ -1,0 +1,4 @@
+interface:
+  display_name: "arXiv TeX Crawler"
+  short_description: "Download and unpack arXiv TeX sources"
+  default_prompt: "Use $arxiv-tex-crawler to download and extract the TeX source for an arXiv URL."

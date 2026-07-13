@@ -141,3 +141,83 @@ It is useful for:
 - saving useful video content into a workspace so it can be referenced by later Codex sessions
 
 The important point is that this skill turns video learning into text-first learning. Once the transcript is saved, I can ask follow-up questions, extract checklists, compare claims, turn the content into notes, or pass the transcript into another skill such as `ask-me-paper` or `thread-learning-log`.
+
+## Lazy-reader
+
+**Motivation**: I want to reduce the time needed to read and understand a paper without losing the details that a short summary usually omits. Important observations, weaknesses, limitations, experimental details, and future directions are often buried in an appendix or a single easy-to-miss paragraph. I want a compact but faithful mini version of the paper, not merely a handful of key points.
+
+**The skill**
+
+`lazy-reader` creates exhaustive reading notes for arXiv papers. It downloads and expands the paper source, reads the paper section by section, and writes a Markdown note that mirrors the paper's structure. The note captures the motivation, method, evidence, experiments, limitations, and open questions with concrete details rather than vague paraphrases. When useful, it places the paper's figures and tables alongside the explanation they support, then produces a standalone HTML version for easier review.
+
+**Usage**
+
+```text
+Use $lazy-reader to create detailed Markdown and HTML reading notes for this paper: <arXiv URL or ID>
+```
+
+It is most useful when I want a durable study artifact for a paper, need to inspect experimental details or appendices, or want to revisit a paper without rereading it from scratch.
+
+## Research-blog-writer
+
+**Motivation**: I want a framework that researches a topic from selected high-quality sources, such as OpenAI, Anthropic, Google Research, Hugging Face, and primary papers or specifications, then turns that research into a strong blog-post draft. The aim is to create a living learning wiki: a well-structured starting point that I can enrich over time when I discover useful related material.
+
+**The skill**
+
+`research-blog-writer` researches a topic before drafting a grounded, technical Markdown post. It begins with first principles for readers with programming literacy, then moves through concepts and implementation-level engineering detail: architecture, APIs, data and control flow, tradeoffs, failure modes, evaluation, and operational concerns. It checks current, preferably primary sources; uses inline citations for specific claims; and finishes with a complete references section. For agentic-AI topics, it can also use the local *Hitchhiker's Guide to Agentic AI* as supporting context while keeping current web research mandatory.
+
+**Usage**
+
+```text
+Use $research-blog-writer to research <topic> and draft a layered Markdown post with deep engineering detail, inline citations, and references.
+```
+
+This is useful for turning a broad topic or one section of an outline into an accurate, extensible technical article rather than a one-off surface-level summary.
+
+### arxiv-tex-crawler
+
+**Motivation**: This supporting skill downloads the TeX source for an arXiv paper. Having the original source gives me access to the figures, tables, and structured content, so I can create a faithful mini version of the paper instead of working only from a PDF.
+
+**The skill**
+
+`arxiv-tex-crawler` accepts an arXiv URL or ID, normalizes it to the source package, downloads it, and safely extracts the package into a local directory. It handles common source formats and reports useful failures, such as a missing or PDF-only source package.
+
+**Usage**
+
+```text
+Use $arxiv-tex-crawler to download and unpack the source for: <arXiv URL or ID>
+```
+
+### Illustrator-planner and Illustrator-drawer
+
+**Motivation**: These supporting skills help me identify illustrations that will genuinely improve a blog post, then turn an approved plan into an accessible figure. The goal is to add visuals that clarify difficult ideas rather than decoration.
+
+**The skill**
+
+`illustrator-planner` reads a document and recommends the smallest useful set of figures. Each recommendation is an implementation-ready `Illustration Request v1` that defines the learning objective, source claim, composition, visual hierarchy, connector semantics, caption, alt text, and acceptance criteria. `illustrator-drawer` uses that approved request to produce an original, static SVG with a responsive embed snippet, then checks the result for readable labels, clear relationships, and accurate connectors.
+
+**Usage**
+
+```text
+Use $illustrator-planner to identify the highest-value illustrations for this draft: <path or pasted Markdown>
+```
+
+Then pass an approved request to the drawing skill:
+
+```text
+Use $illustrator-drawer to create the SVG for this Illustration Request v1: <request>
+```
+
+### Markdown-to-html
+
+**Motivation**: This is a supporting skill. I prefer Markdown as the editable source, but reviewing a long document in plain Markdown is limited. A standalone HTML article is more comfortable to read and easier to review.
+
+**The skill**
+
+`markdown-to-html` converts a local Markdown file into a self-contained HTML article while leaving the Markdown unchanged. The generated file has embedded styling, semantic article structure, heading anchors, a responsive table of contents, and support for tables, lists, links, citations, and fenced code blocks. It has no external CSS, JavaScript, fonts, or build requirement.
+
+**Usage**
+
+```text
+Use $markdown-to-html to convert this Markdown file into a standalone HTML article: <path-to-file.md>
+```

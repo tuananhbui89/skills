@@ -1,0 +1,4 @@
+interface:
+  display_name: "Illustrator Planner"
+  short_description: "Plan high-value document illustrations"
+  default_prompt: "Use $illustrator-planner to identify the few illustrations that would make this document easier to understand."

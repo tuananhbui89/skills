@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lazy Reader"
+  short_description: "Create exhaustive arXiv reading notes"
+  default_prompt: "Use $lazy-reader to turn this arXiv URL into an exhaustive, section-preserving Markdown reading note and standalone HTML article with figures and tables in context."
