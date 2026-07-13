@@ -192,6 +192,11 @@ Use $arxiv-tex-crawler to download and unpack the source for: <arXiv URL or ID>
 
 **Motivation**: These supporting skills help me identify illustrations that will genuinely improve a blog post, then turn an approved plan into an accessible figure. The goal is to add visuals that clarify difficult ideas rather than decoration.
 
+I borrow some ideas from:
+
+- [https://developers.google.com/tech-writing/two/illustrations](https://developers.google.com/tech-writing/two/illustrations)
+- algorithmic-art from Anthropic at [https://github.com/anthropics/skills/blob/main/skills/algorithmic-art/SKILL.md](https://github.com/anthropics/skills/blob/main/skills/algorithmic-art/SKILL.md)
+
 **The skill**
 
 `illustrator-planner` reads a document and recommends the smallest useful set of figures. Each recommendation is an implementation-ready `Illustration Request v1` that defines the learning objective, source claim, composition, visual hierarchy, connector semantics, caption, alt text, and acceptance criteria. `illustrator-drawer` uses that approved request to produce an original, static SVG with a responsive embed snippet, then checks the result for readable labels, clear relationships, and accurate connectors.
