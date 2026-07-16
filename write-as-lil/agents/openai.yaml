@@ -1,0 +1,6 @@
+interface:
+  display_name: "Write as Lil"
+  short_description: "Iterative Lil’Log-inspired technical writing review"
+  default_prompt: "Use $write-as-lil to improve this technical article one high-impact change at a time."
+policy:
+  allow_implicit_invocation: false

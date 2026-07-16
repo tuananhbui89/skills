@@ -4,7 +4,7 @@ This repository collects the Codex skills I have used regularly since January 20
 
 For example, `thread-learning-log` helps me capture what I learned from a session so that daily work turns into reusable knowledge, more importantly, encourage me to learn something new each day. `grill-me` helps pressure-test a plan or design by surfacing hidden assumptions, unresolved decisions, and likely limitations before implementation begins.
 
-Link to the Github repository: [https://github.com/tuananhbui89/skills]
+Link to the Github repository: [https://github.com/tuananhbui89/skills](https://github.com/tuananhbui89/skills)
 
 ## Thread Learning Log
 
@@ -226,3 +226,21 @@ Use $illustrator-drawer to create the SVG for this Illustration Request v1: <req
 ```text
 Use $markdown-to-html to convert this Markdown file into a standalone HTML article: <path-to-file.md>
 ```
+
+### Write-as-Lil
+
+**Motivation**: This is a review-and-suggestion skill inspired by the depth, logical flow, and teaching focus of [Lilian Weng's Lil'Log](https://lilianweng.github.io/). I distilled useful research-writing principles from those posts into a review workflow that can improve a technical draft without impersonating Lilian Weng or reproducing her distinctive prose. The aim is to make an article easier to follow, better grounded in evidence, more honest about trade-offs, and more effective at teaching its central ideas.
+
+**The skill**
+
+`write-as-lil` reviews an explicitly supplied technical blog post or document as a research-writing coach. Before recommending anything, it reads the complete source and builds argument, content-coverage, and visual-coverage maps. It then proposes exactly one highest-impact improvement at a time, starting with article architecture and evidence before moving to teaching flow, visuals, and local prose. Each recommendation identifies the source anchor, reader-facing problem, a concrete edit plan, any required research citation, and observable acceptance criteria.
+
+The review is deliberately approval-gated: it waits for `Accept`, `Reject`, or `Adjust` before editing. Accepted changes are limited to the approved scope, and Markdown/HTML companion files stay synchronized. When an illustration is warranted, the skill checks whether a permitted source figure can teach the point; otherwise it hands an approved illustration request to `illustrator-planner` and `illustrator-drawer`.
+
+**Usage**
+
+```text
+Use $write-as-lil to review this technical blog draft. Audit the whole document first, then propose one improvement at a time and wait for my approval: <path or pasted draft>
+```
+
+It is useful when I want rigorous editorial feedback on a long technical article without receiving an overwhelming backlog or having the draft changed without approval.
