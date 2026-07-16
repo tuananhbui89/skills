@@ -1,6 +1,6 @@
 ---
 name: lazy-reader
-description: Create exhaustive Markdown and standalone HTML reading notes for arXiv papers. Use when the user provides an arXiv URL or ID and asks to read, summarize, explain, make notes for, or create a lazy-reader report from a paper, especially when the output should preserve the paper's section flow, extract specific claims and details, reuse figures/tables in context, and include motivation, insights, method, experiments, limitations, and open questions.
+description: Create exhaustive Markdown and standalone HTML reading notes for arXiv papers. Use when the user provides an arXiv URL or ID and asks to read, summarize, explain, make notes for, or create a lazy-reader report from a paper, especially when the output should preserve the paper's section flow, extract specific claims and details, preserve mathematical content as properly delimited LaTeX, reuse figures/tables in context, and include motivation, insights, method, experiments, limitations, and open questions.
 ---
 
 # Lazy Reader
@@ -34,7 +34,7 @@ python3 /Users/tuananhbui/.codex/skills/lazy-reader/scripts/inline_html_images.p
 3. Use `asset_snippets.md` and `asset_manifest.json` to place figures and tables at the point where they naturally belong in the reading flow. Match each figure/table to the nearest source section, paragraph, method component, experiment, result, or limitation it supports. Do not collect all figures and tables at the end unless the source itself does so.
 4. Write `<arxiv-id>-lazy-reader.md` in the output directory as the canonical source.
 5. Convert with `$markdown-to-html`, then run `inline_html_images.py` so the final HTML remains standalone even when the Markdown used local figure links.
-6. Verify the HTML has `<!doctype html>`, a correct title, a table of contents, rendered Markdown tables, and no remaining local `figures/...` image references.
+6. Verify the HTML has `<!doctype html>`, a correct title, a table of contents, rendered Markdown tables, native MathML for every equation, and no remaining local `figures/...` image references.
 
 ## Core Reading Principles
 
@@ -90,10 +90,30 @@ The incorrect style duplicates the quote's content and adds unnecessary attribut
 
 Transform the extraction before writing the final Markdown:
 
-1. Remove citation markers and reference links. Strip superscript numbers, bracketed references such as `[1]`, inline citations such as `(Smith et al., 2023)`, URLs, and DOI links unless a URL is the paper source line.
+1. Remove citation markers and reference links. Strip superscript numbers, bracketed references such as `[1]`, inline citations such as `(Smith et al., 2023)`, URLs, and DOI links unless a URL is the paper source line. Do not remove square brackets, backslashes, subscripts, superscripts, or other syntax that belongs to a mathematical expression.
 2. Add an overview/takeaway at the top. This must be one concise paragraph of 3-6 sentences capturing the main contribution, key findings, and significance. Do not use bullet points in the overview.
 3. Preserve the source's section structure when it works well. If the paper has unclear sections, reorganize thematically using headings that reflect the content, but do not remove extracted items during reorganization.
 4. Only output the Step 2 result. Do not include preambles, process notes, "Step 1", "Step 2", or closing meta-commentary in the reading note.
+
+## Mathematical Notation
+
+Preserve the paper's mathematical claims when equations are necessary to explain the method, objective, algorithm, result, or limitation. Translate source TeX into Markdown-compatible LaTeX; do not flatten it into plaintext, put it in a code block, or omit its definitions solely because it is technical.
+
+- Use `$...$` for inline notation, such as `the model predicts $z_{t+1}$ from $z_t$ and $a_t$`.
+- Use `\[...\]` for display equations on their own lines, such as:
+
+  ```markdown
+  \[
+  \mathcal{L}_{\mathrm{pred}} = \left\|\hat z_{t+1} - z_{t+1}\right\|_2^2.
+  \]
+  ```
+
+- `$$...$$` is also valid for display math, but prefer `\[...\]` in generated notes for clarity.
+- Define every important symbol in nearby prose when the paper does not make its meaning obvious from context. Explain what the equation contributes; never insert an equation as decoration.
+- Preserve only equations that materially support the reading flow. For a long derivation, retain the key objective or update rule and explain the omitted algebra rather than copying a dense derivation without teaching value.
+- Keep ordinary prose, citations, URLs, and code outside math delimiters. Escape literal dollar signs as `\$`.
+
+The paired `$markdown-to-html` skill converts these standard delimiters into self-contained native MathML. After conversion, verify that no literal `\[`/`\]` or `$$` delimiters remain in the HTML and that equations are not rendered as code blocks.
 
 ## Required Markdown Structure
 
@@ -149,6 +169,8 @@ The source-section extraction should naturally cover these questions, but verify
 - What limitations, caveats, failure cases, and open questions remain?
 
 If a required question is not addressed directly by the paper, say so in the relevant section with the most specific evidence available.
+
+Also verify that the final note retains every equation needed to explain a covered method or result, and that all retained equations use `$...$`, `\(...\)`, `\[...\]`, or `$$...$$` delimiters.
 
 ## Handling Edge Cases
 

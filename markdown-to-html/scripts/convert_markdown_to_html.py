@@ -12,6 +12,19 @@ try:
 except ImportError as exc:  # pragma: no cover - environment guard
     raise SystemExit("mistune is required: python3 -m pip install mistune") from exc
 
+try:
+    from latex2mathml.converter import convert as latex_to_mathml
+except ImportError as exc:  # pragma: no cover - environment guard
+    raise SystemExit(
+        "latex2mathml is required for LaTeX rendering: "
+        "python3 -m pip install latex2mathml"
+    ) from exc
+
+try:
+    from mistune.plugins.math import math as mistune_math
+except ImportError as exc:  # pragma: no cover - environment guard
+    raise SystemExit("Mistune's math plugin is required; upgrade mistune") from exc
+
 
 ARTICLE_CSS = """
 :root {
@@ -180,6 +193,23 @@ code {
   padding: 0.12rem 0.28rem;
 }
 
+.math-display {
+  margin: 24px 0;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.math-display math {
+  display: block;
+  margin: 0 auto;
+  width: max-content;
+  max-width: 100%;
+}
+
+.math-inline math {
+  vertical-align: -0.2em;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -259,11 +289,61 @@ def render_markdown(markdown_text: str) -> str:
     last_error: Exception | None = None
     for plugins in plugin_sets:
         try:
-            markdown = mistune.create_markdown(escape=True, plugins=list(plugins))
-            return markdown(markdown_text)
+            markdown = mistune.create_markdown(
+                escape=True, plugins=[*plugins, mistune_math]
+            )
+            return render_mathml(markdown(normalize_latex_delimiters(markdown_text)))
         except Exception as exc:  # pragma: no cover - fallback for mistune variants
             last_error = exc
     raise RuntimeError(f"Unable to render Markdown: {last_error}")
+
+
+FENCED_CODE_RE = re.compile(r"(^```.*?^```)", re.MULTILINE | re.DOTALL)
+BRACKET_DISPLAY_MATH_RE = re.compile(r"\\\[(.*?)\\\]", re.DOTALL)
+PAREN_INLINE_MATH_RE = re.compile(r"\\\((.*?)\\\)", re.DOTALL)
+BLOCK_MATH_HTML_RE = re.compile(
+    r'<div class="math">\$\$\s*(.*?)\s*\$\$</div>', re.DOTALL
+)
+INLINE_MATH_HTML_RE = re.compile(
+    r'<span class="math">\\\((.*?)\\\)</span>', re.DOTALL
+)
+
+
+def normalize_latex_delimiters(markdown_text: str) -> str:
+    """Normalize common LaTeX delimiters without changing fenced code samples."""
+
+    def normalize_prose(segment: str) -> str:
+        segment = BRACKET_DISPLAY_MATH_RE.sub(
+            lambda match: f"$$\n{match.group(1).strip()}\n$$", segment
+        )
+        return PAREN_INLINE_MATH_RE.sub(
+            lambda match: f"${match.group(1).strip()}$", segment
+        )
+
+    return "".join(
+        segment if FENCED_CODE_RE.fullmatch(segment) else normalize_prose(segment)
+        for segment in FENCED_CODE_RE.split(markdown_text)
+    )
+
+
+def mathml(latex: str, display: bool) -> str:
+    """Convert a LaTeX expression into self-contained, browser-native MathML."""
+
+    rendered = latex_to_mathml(latex.strip())
+    if display:
+        rendered = rendered.replace('display="inline"', 'display="block"', 1)
+    return rendered
+
+
+def render_mathml(body_html: str) -> str:
+    def render_block(match: re.Match[str]) -> str:
+        return f'<div class="math-display">{mathml(match.group(1), display=True)}</div>'
+
+    def render_inline(match: re.Match[str]) -> str:
+        return f'<span class="math-inline">{mathml(match.group(1), display=False)}</span>'
+
+    body_html = BLOCK_MATH_HTML_RE.sub(render_block, body_html)
+    return INLINE_MATH_HTML_RE.sub(render_inline, body_html)
 
 
 HEADING_RE = re.compile(r"<h([1-6])>(.*?)</h\1>", re.DOTALL)

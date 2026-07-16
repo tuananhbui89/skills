@@ -6,6 +6,22 @@ For example, `thread-learning-log` helps me capture what I learned from a sessio
 
 Link to the Github repository: [https://github.com/tuananhbui89/skills](https://github.com/tuananhbui89/skills)
 
+## Skills Map
+
+| Skill | Use it when |
+| --- | --- |
+| [`thread-learning-log`](thread-learning-log/SKILL.md) | Turn the current Codex thread into a durable learning-log entry after confirmation. |
+| [`grill-me`](grill-me/SKILL.md) | Pressure-test a plan, proposal, or architecture through a decision-by-decision interview. |
+| [`ask-me-paper`](ask-me-paper/SKILL.md) | Test and deepen your understanding of a paper or article with one rigorous question at a time. |
+| [`youtube-transcript`](youtube-transcript/SKILL.md) | Fetch, save, and summarize a YouTube video's transcript. |
+| [`lazy-reader`](lazy-reader/SKILL.md) | Create exhaustive, structured reading notes for an arXiv paper, including key evidence and visuals. |
+| [`research-blog-writer`](research-blog-writer/SKILL.md) | Research and draft a new grounded technical blog post from a topic or outline. |
+| [`arxiv-tex-crawler`](arxiv-tex-crawler/SKILL.md) | Download and unpack an arXiv paper's TeX source, figures, and supporting files. |
+| [`illustrator-planner`](illustrator-planner/SKILL.md) | Identify and specify the teaching visuals that would improve a document. |
+| [`illustrator-drawer`](illustrator-drawer/SKILL.md) | Create an original accessible SVG from an approved illustration request. |
+| [`markdown-to-html`](markdown-to-html/SKILL.md) | Convert local Markdown into a self-contained HTML article with rendered math. |
+| [`write-as-lil`](write-as-lil/SKILL.md) | Iteratively review an existing technical draft through approval-gated editorial improvements. |
+
 ## Thread Learning Log
 
 **Motivation**: I want a lightweight way to track what I actually learn while working with AI agents. Today, agents can support many parts of our work, such as reading papers, planning experiments, writing code, debugging, and running evaluations. As a result, we can accomplish much more in a single day than before.
@@ -160,7 +176,7 @@ It is most useful when I want a durable study artifact for a paper, need to insp
 
 ## Research-blog-writer
 
-**Motivation**: I want a framework that researches a topic from selected high-quality sources, such as OpenAI, Anthropic, Google Research, Hugging Face, and primary papers or specifications, then turns that research into a strong blog-post draft. The aim is to create a living learning wiki: a well-structured starting point that I can enrich over time when I discover useful related material.
+**Motivation**: I want a framework that researches a topic from selected high-quality sources, such as OpenAI, Anthropic, Google Research, Hugging Face, and primary papers or specifications, then turns that research into a strong blog-post draft. The aim is to create a living learning wiki: a well-structured starting point that I can enrich over time when I discover useful related material. I use this skill to create the [AI Agents 101 Series](https://tuananhbui89.github.io/blog/2026/ai-agents-series/).
 
 **The skill**
 

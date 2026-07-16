@@ -1,6 +1,6 @@
 ---
 name: research-blog-writer
-description: Research and write grounded blog-style Markdown posts from a topic, outline, or source section. Use when the user asks to study a topic, develop a section into a blog post, create layered explanations from fundamentals to deep engineering detail, split an outline into researched posts, or produce writing that must use current web research with inline citations and a references section.
+description: Research and write grounded blog-style Markdown posts from a topic, outline, or source section. Use when the user asks to study a topic, develop a section into a blog post, create layered explanations from fundamentals to deep engineering detail, split an outline into researched posts, or produce writing that must use current web research, correctly delimited LaTeX equations, inline citations, and a references section.
 ---
 
 # Research Blog Writer
@@ -87,6 +87,26 @@ Citation rules:
 - Do not cite every sentence; cite claim clusters where the source support is clear.
 - Never invent source details, dates, titles, or URLs.
 
+### 5a. Write mathematical notation as LaTeX
+
+When mathematical notation improves precision, write it as Markdown-compatible LaTeX rather than plaintext approximations, code blocks, or escaped backslashes.
+
+- Use `$...$` for inline notation, such as `the latent state is $z_t = e_\theta(o_t)$`.
+- Use `\[...\]` for a display equation on its own lines, such as:
+
+  ```markdown
+  \[
+  \mathcal{L}_{\mathrm{pred}} = \left\|\hat z_{t+1} - z_{t+1}\right\|_2^2.
+  \]
+  ```
+
+- `$$...$$` is also valid for display equations when the target renderer supports it; prefer `\[...\]` in generated Markdown for clarity.
+- Keep explanatory prose immediately before or after each display equation: define symbols on first use and state why the equation matters.
+- Do not put equations in fenced code blocks, inline code, or blockquotes unless the article is explicitly documenting literal source syntax.
+- Do not wrap ordinary prose such as variable names in accidental math delimiters. Escape literal dollar signs as `\$`.
+
+The paired `$markdown-to-html` skill converts these delimiters into standalone native MathML. Preserve the Markdown file as the canonical source and invoke that skill when an HTML version is requested.
+
 ### 6. Audit before finalizing
 
 Before returning or writing the final post:
@@ -99,6 +119,7 @@ Before returning or writing the final post:
 - remove unsupported claims or soften them
 - check the post starts at a basic level before going deeper
 - check the post does not stop at surface explanation; add technical mechanisms, implementation detail, failure modes, and evaluation guidance if the deep section feels thin
+- check that every mathematical expression uses `$...$`, `\(...\)`, `\[...\]`, or `$$...$$` delimiters and that no equation was accidentally emitted as plaintext or a code block
 - check that the final file is valid Markdown
 
 ## Output Defaults
