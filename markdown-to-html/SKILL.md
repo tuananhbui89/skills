@@ -1,13 +1,13 @@
 ---
 name: markdown-to-html
-description: Convert local Markdown files into standalone self-contained HTML articles. Use when the user asks to render, publish, preview, or convert a `.md` Markdown document as an `.html` file with embedded CSS, native MathML-rendered LaTeX equations, semantic article structure, tables, links, lists, fenced code blocks, and no external assets.
+description: Convert local Markdown files into polished HTML articles with accurate LaTeX, semantic article structure, tables, links, lists, and fenced code blocks. Use when Codex needs to render, publish, preview, or convert a `.md` file to `.html`, especially when correct mathematical typesetting matters.
 ---
 
 # Markdown to HTML
 
 ## Overview
 
-Use this skill to convert a Markdown document into a standalone HTML article. The converter preserves the Markdown file as the source of truth and writes a derived `.html` file that can be opened directly from disk. Generated articles include a side-panel table of contents built from section headings for quick in-page navigation. LaTeX is rendered as browser-native MathML, so the output remains standalone and does not depend on a CDN or JavaScript.
+Use this skill to convert a Markdown document into an HTML article. The converter preserves the Markdown file as the source of truth and writes a derived `.html` file that can be opened directly from disk. Generated articles include a side-panel table of contents built from section headings for quick in-page navigation. By default, LaTeX is rendered with MathJax’s TeX-to-SVG engine, which handles complex delimiters, scripts, matrices, and operators more faithfully than the lightweight MathML converter.
 
 ## Quick Start
 
@@ -15,6 +15,12 @@ Use the bundled script:
 
 ```bash
 python3 markdown-to-html/scripts/convert_markdown_to_html.py input.md --output output.html
+```
+
+For a fully offline file, request the less complete native-MathML fallback explicitly:
+
+```bash
+python3 markdown-to-html/scripts/convert_markdown_to_html.py input.md --output output.html --math-renderer mathml
 ```
 
 Optional title override:
@@ -43,18 +49,20 @@ If `--title` is omitted, infer the title from the first Markdown H1. If no H1 ex
    - reference URLs and other external HTTP(S) links are clickable
    - external links include `target="_blank"` and `rel="noopener noreferrer"`
    - tables, lists, links, citations, references, and fenced code blocks render as HTML
-   - inline `$...$` and `\(...\)` equations render as inline MathML
-   - display `$$...$$` and `\[...\]` equations render as display MathML, not as literal LaTeX or code blocks
+   - inline `$...$` and `\(...\)` equations render as inline MathJax SVG (or MathML with `--math-renderer mathml`)
+   - display `$$...$$` and `\[...\]` equations render as display math, not as literal LaTeX or code blocks
+   - formulas with paired delimiters, nested scripts, and multi-line alignment render correctly in the selected renderer
 
 ## Output Rules
 
-The generated HTML must be self-contained:
+The generated HTML must include:
 
 - include `<!doctype html>`, `<html lang="en">`, `<head>`, `<body>`, `<main>`, and `<article>`
 - include `meta charset="utf-8"` and responsive viewport metadata
 - include all CSS inline in a `<style>` block
-- require no external CSS, JavaScript, fonts, images, or build tooling
-- convert supported LaTeX to native MathML: use `$...$` or `\(...\)` for inline math, and `$$...$$` or `\[...\]` for display math
+- use `$...$` or `\(...\)` for inline math, and `$$...$$` or `\[...\]` for display math
+- use MathJax SVG by default for accurate TeX rendering. This adds one external MathJax script and requires network access when the article opens.
+- use `--math-renderer mathml` only when an offline, no-JavaScript artifact is required; test complex equations because the fallback has narrower TeX coverage.
 - keep visual styling quiet, readable, and article-focused
 - include a responsive table of contents beside the article when section headings exist; on narrow screens it may stack above the article
 - add stable `id` anchors to rendered headings so table-of-contents links work from local files
@@ -66,7 +74,7 @@ Do not edit the Markdown input unless the user explicitly asks. Treat HTML as a 
 ## Script
 
 - `scripts/convert_markdown_to_html.py`
-  Converts Markdown to standalone HTML using local `mistune` and `latex2mathml`. Supports headings, heading anchors, a side-panel table of contents, LaTeX-to-MathML conversion, clickable external links, paragraphs, links, lists, blockquotes, tables, fenced code blocks, and inline citation text.
+  Converts Markdown to HTML using local `mistune`. The default MathJax renderer preserves TeX for high-fidelity SVG typesetting; `--math-renderer mathml` converts supported expressions with `latex2mathml` for offline use. Supports headings, heading anchors, a side-panel table of contents, clickable external links, paragraphs, links, lists, blockquotes, tables, fenced code blocks, and inline citation text.
 
 ## Reusable Prompt Pattern
 

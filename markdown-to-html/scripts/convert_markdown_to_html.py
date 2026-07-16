@@ -14,11 +14,8 @@ except ImportError as exc:  # pragma: no cover - environment guard
 
 try:
     from latex2mathml.converter import convert as latex_to_mathml
-except ImportError as exc:  # pragma: no cover - environment guard
-    raise SystemExit(
-        "latex2mathml is required for LaTeX rendering: "
-        "python3 -m pip install latex2mathml"
-    ) from exc
+except ImportError:  # pragma: no cover - optional offline renderer
+    latex_to_mathml = None
 
 try:
     from mistune.plugins.math import math as mistune_math
@@ -210,6 +207,14 @@ code {
   vertical-align: -0.2em;
 }
 
+.math-display mjx-container[display="true"] {
+  margin: 0 auto !important;
+}
+
+.math-inline mjx-container {
+  margin: 0 !important;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -279,7 +284,7 @@ def infer_title(markdown_text: str, input_path: Path) -> str:
     return input_path.stem.replace("-", " ").replace("_", " ").title()
 
 
-def render_markdown(markdown_text: str) -> str:
+def render_markdown(markdown_text: str, math_renderer: str) -> str:
     plugin_sets = (
         ("table", "strikethrough", "task_lists"),
         ("table", "strikethrough"),
@@ -292,7 +297,10 @@ def render_markdown(markdown_text: str) -> str:
             markdown = mistune.create_markdown(
                 escape=True, plugins=[*plugins, mistune_math]
             )
-            return render_mathml(markdown(normalize_latex_delimiters(markdown_text)))
+            body_html = markdown(normalize_latex_delimiters(markdown_text))
+            if math_renderer == "mathjax":
+                return render_mathjax(body_html)
+            return render_mathml(body_html)
         except Exception as exc:  # pragma: no cover - fallback for mistune variants
             last_error = exc
     raise RuntimeError(f"Unable to render Markdown: {last_error}")
@@ -329,6 +337,11 @@ def normalize_latex_delimiters(markdown_text: str) -> str:
 def mathml(latex: str, display: bool) -> str:
     """Convert a LaTeX expression into self-contained, browser-native MathML."""
 
+    if latex_to_mathml is None:
+        raise RuntimeError(
+            "latex2mathml is required for --math-renderer mathml: "
+            "python3 -m pip install latex2mathml"
+        )
     rendered = latex_to_mathml(latex.strip())
     if display:
         rendered = rendered.replace('display="inline"', 'display="block"', 1)
@@ -344,6 +357,28 @@ def render_mathml(body_html: str) -> str:
 
     body_html = BLOCK_MATH_HTML_RE.sub(render_block, body_html)
     return INLINE_MATH_HTML_RE.sub(render_inline, body_html)
+
+
+def render_mathjax(body_html: str) -> str:
+    """Keep TeX delimiters for MathJax's more complete TeX parser."""
+
+    def render_block(match: re.Match[str]) -> str:
+        return f'<div class="math-display">\\[\n{match.group(1).strip()}\n\\]</div>'
+
+    return BLOCK_MATH_HTML_RE.sub(render_block, body_html)
+
+
+MATHJAX_HEAD = """  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\\\(', '\\\\)'], ['$', '$']],
+        displayMath: [['\\\\[', '\\\\]'], ['$$', '$$']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+"""
 
 
 HEADING_RE = re.compile(r"<h([1-6])>(.*?)</h\1>", re.DOTALL)
@@ -498,7 +533,7 @@ def build_toc_html(toc_entries: list[tuple[int, str, str]]) -> str:
 """
 
 
-def build_html_document(title: str, body_html: str) -> str:
+def build_html_document(title: str, body_html: str, math_renderer: str) -> str:
     escaped_title = html.escape(title, quote=True)
     body_html, toc_entries = prepare_article_html(body_html)
     toc_html = build_toc_html(toc_entries)
@@ -508,7 +543,7 @@ def build_html_document(title: str, body_html: str) -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{escaped_title}</title>
-  <style>
+{MATHJAX_HEAD if math_renderer == "mathjax" else ""}  <style>
 {ARTICLE_CSS}
   </style>
 </head>
@@ -526,7 +561,7 @@ def build_html_document(title: str, body_html: str) -> str:
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Convert a Markdown file into a standalone HTML article."
+        description="Convert a Markdown file into an HTML article."
     )
     parser.add_argument("input", type=Path, help="Markdown input file")
     parser.add_argument(
@@ -536,6 +571,15 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="HTML output file. Defaults to the input path with .html suffix.",
     )
     parser.add_argument("--title", help="Override the HTML <title> value")
+    parser.add_argument(
+        "--math-renderer",
+        choices=("mathjax", "mathml"),
+        default="mathjax",
+        help=(
+            "LaTeX renderer: mathjax (default, accurate TeX-to-SVG via CDN) or "
+            "mathml (offline native MathML fallback)"
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -553,8 +597,8 @@ def main(argv: list[str] | None = None) -> int:
 
     markdown_text = input_path.read_text(encoding="utf-8")
     title = args.title or infer_title(markdown_text, input_path)
-    body_html = render_markdown(markdown_text)
-    document = build_html_document(title, body_html)
+    body_html = render_markdown(markdown_text, args.math_renderer)
+    document = build_html_document(title, body_html, args.math_renderer)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(document, encoding="utf-8")

@@ -24,6 +24,8 @@ python3 /Users/tuananhbui/.codex/skills/markdown-to-html/scripts/convert_markdow
 python3 /Users/tuananhbui/.codex/skills/lazy-reader/scripts/inline_html_images.py docs/lazy-reader/<arxiv-id>/<arxiv-id>-lazy-reader.html
 ```
 
+The default renderer uses MathJax SVG for reliable TeX. For a fully offline artifact, add `--math-renderer mathml` to the conversion command and test every retained equation with paired delimiters, nested scripts, matrices, or alignment.
+
 ## Workflow
 
 1. Run `prepare_paper_materials.py` first. It normalizes the arXiv URL or ID, invokes `$arxiv-tex-crawler`, saves arXiv HTML when available, expands TeX inputs, extracts figure/table snippets, and prepares local figure assets.
@@ -33,8 +35,8 @@ python3 /Users/tuananhbui/.codex/skills/lazy-reader/scripts/inline_html_images.p
    - `paper.pdf` only when HTML and TeX are unavailable or insufficient
 3. Use `asset_snippets.md` and `asset_manifest.json` to place figures and tables at the point where they naturally belong in the reading flow. Match each figure/table to the nearest source section, paragraph, method component, experiment, result, or limitation it supports. Do not collect all figures and tables at the end unless the source itself does so.
 4. Write `<arxiv-id>-lazy-reader.md` in the output directory as the canonical source.
-5. Convert with `$markdown-to-html`, then run `inline_html_images.py` so the final HTML remains standalone even when the Markdown used local figure links.
-6. Verify the HTML has `<!doctype html>`, a correct title, a table of contents, rendered Markdown tables, native MathML for every equation, and no remaining local `figures/...` image references.
+5. Convert with `$markdown-to-html` using its default MathJax renderer, then run `inline_html_images.py` so the figures are embedded. Use the MathML fallback only when offline operation is required.
+6. Verify the HTML has `<!doctype html>`, a correct title, a table of contents, rendered Markdown tables, correctly rendered display and inline equations, and no remaining local `figures/...` image references.
 
 ## Core Reading Principles
 
@@ -113,7 +115,7 @@ Preserve the paper's mathematical claims when equations are necessary to explain
 - Preserve only equations that materially support the reading flow. For a long derivation, retain the key objective or update rule and explain the omitted algebra rather than copying a dense derivation without teaching value.
 - Keep ordinary prose, citations, URLs, and code outside math delimiters. Escape literal dollar signs as `\$`.
 
-The paired `$markdown-to-html` skill converts these standard delimiters into self-contained native MathML. After conversion, verify that no literal `\[`/`\]` or `$$` delimiters remain in the HTML and that equations are not rendered as code blocks.
+The paired `$markdown-to-html` skill uses MathJax SVG by default, so the retained TeX delimiters are expected in the generated HTML until the browser renders them. Verify in a browser that equations are typeset rather than shown as literal TeX or code blocks. For the `--math-renderer mathml` fallback, verify that no literal `\[`/`\]` or `$$` delimiters remain in the HTML and test complex notation explicitly.
 
 ## Required Markdown Structure
 
