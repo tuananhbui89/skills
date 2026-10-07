@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tough Review"
+  short_description: "Relentless ML paper critique, one concern at a time"
+  default_prompt: "Use $tough-review to review this ML/AI paper relentlessly, one concern at a time."

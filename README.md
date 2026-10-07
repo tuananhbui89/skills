@@ -13,6 +13,7 @@ Link to the Github repository: [https://github.com/tuananhbui89/skills](https://
 | [`thread-learning-log`](thread-learning-log/SKILL.md) | Turn the current Codex thread into a durable learning-log entry after confirmation. |
 | [`grill-me`](grill-me/SKILL.md) | Pressure-test a plan, proposal, or architecture through a decision-by-decision interview. |
 | [`ask-me-paper`](ask-me-paper/SKILL.md) | Test and deepen your understanding of a paper or article with one rigorous question at a time. |
+| [`tough-review`](tough-review/SKILL.md) | Review an ML/AI paper for critical weaknesses, including its appendix, one concern at a time. |
 | [`youtube-transcript`](youtube-transcript/SKILL.md) | Fetch, save, and summarize a YouTube video's transcript. |
 | [`lazy-reader`](lazy-reader/SKILL.md) | Create exhaustive, structured reading notes for an arXiv paper, including key evidence and visuals. |
 | [`research-blog-writer`](research-blog-writer/SKILL.md) | Research and draft a new grounded technical blog post from a topic or outline. |
@@ -122,6 +123,32 @@ It is useful in several moments:
 - after using an AI agent to summarize a paper, to make sure I did not only outsource the understanding
 
 The most valuable behavior is correction. If I choose the wrong answer, the skill should not simply reveal the correct option and move on. It should explain the misconception, point back to the paper's evidence or logic, and ask a targeted follow-up question when the misunderstanding affects later understanding. That turns paper reading into an active loop: commit, get corrected, refine the model, and continue.
+
+## Tough Review
+
+**Motivation**: Before submitting an ML/AI paper, I want to understand where a demanding reviewer could challenge it. A contribution may sound convincing in the introduction while relying on an untested assumption, an incomplete baseline comparison, or evidence that supports a narrower claim. I want a review that reads the method, experiments, and appendix together, then helps me work through the strongest objections.
+
+`tough-review` applies the interview pattern to paper critique. `ask-me-paper` helps me understand a paper; `tough-review` asks whether its claims hold up and what evidence or revision would address a weakness.
+
+**The skill**
+
+The core behavior of `tough-review` is:
+
+- Read the full available paper, including appendices and supplements, before raising the first concern. For a local LaTeX project, inspect the section files, figures, tables, and relevant bibliography too.
+- Build an internal critique map covering the contribution, assumptions, method, theory, experiments, limitations, and reproducibility. Prioritize threats to the central claim and novelty before smaller presentation issues.
+- Check external literature by default when assessing novelty, related work, baselines, or evaluation norms. Prefer primary sources and distinguish the paper's evidence from external context; mark those judgments as provisional when external context is unavailable.
+- Raise exactly one independent concern at a time. Identify where it appears, why it matters, what would fully address it, and one direct question for me to answer.
+- Assess each response as resolved, partially resolved, unresolved, or an explicit limitation. Follow up when evidence is missing, and continue until all substantial concerns have been raised or I ask to pause.
+
+The useful part is the revision target attached to each concern. A missing baseline may require an experiment, an unsupported theorem may require a corrected proof, and an overbroad claim may require narrower wording. Adding a limitations sentence is sufficient only when it actually addresses the concern's severity. When the review stops, the skill summarizes the remaining weaknesses and concrete modifications needed.
+
+**Usage**
+
+```text
+Use $tough-review to review this ML/AI manuscript, including its appendix and supplements. Raise one concern at a time, explain what would fully address it, and wait for my answer: <PDF or LaTeX project path>
+```
+
+This is useful before submission, when revising a draft, or when checking whether a rebuttal answers a reviewer's objection. Supplying the complete manuscript and supporting material gives the review a stronger basis for judging the work.
 
 ## YouTube Transcript
 
