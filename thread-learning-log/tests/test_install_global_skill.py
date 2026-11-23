@@ -16,7 +16,7 @@ model = "gpt-5.4"
 
 [sandbox_workspace_write]
 writable_roots = [
-  "/Users/tuananhbui/Workspace/Joplin",
+  "/example/workspace",
 ]
 network_access = false
 """.lstrip()
@@ -36,6 +36,8 @@ network_access = false
                     str(SCRIPT_PATH),
                     "--codex-home",
                     str(codex_home),
+                    "--writable-root",
+                    str(skills_dir / "thread-learning-log"),
                 ],
                 capture_output=True,
                 text=True,
@@ -73,6 +75,8 @@ network_access = false
                     str(SCRIPT_PATH),
                     "--codex-home",
                     str(codex_home),
+                    "--writable-root",
+                    str(skills_dir / "thread-learning-log"),
                 ],
                 capture_output=True,
                 text=True,

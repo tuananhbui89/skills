@@ -1,0 +1,18 @@
+# Runtime data can include private conversation content.
+learning-log.md
+reports/
+.personal-memory/
+.env
+.env.*
+*.sqlite
+*.sqlite-*
+*.db
+*.lock
+__pycache__/
+*.pyc
+node_modules/
+dist/
+assets/learning-log-site/src/generated/
+assets/learning-log-site/public/site-data.json
+assets/learning-log-site/public/log-assets/
+.DS_Store

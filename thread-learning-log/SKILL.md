@@ -1,29 +1,34 @@
 ---
 name: thread-learning-log
-description: "Use when asked to summarize the current Codex thread into a durable learning-log entry and append it to the personal learning log after confirmation."
+description: "Turn the current Codex thread into a durable learning-log entry, or review weekly Codex activity for accomplishments, ongoing work and reusable lessons. Use for manual reflection or an explicitly authorized recurring review."
 ---
 
 # Thread Learning Log
 
-This skill has one mode: `log-thread`.
+Use `log-thread` for reflection on the visible chat. Use `weekly-review` for a bounded review of historical chats, including an explicitly authorized scheduled run. Read [the weekly workflow](references/weekly-review.md) only for that mode.
 
-The learning log lives in the installed global skill folder:
+The weekly package includes the scanner, validated publisher, local website template, and [reusable automation prompt](references/automation-prompt.md). Installing the skill does not create an automation.
+
+The default learning log lives in the installed global skill folder (respecting `CODEX_HOME`):
 
 ```text
 ~/.codex/skills/thread-learning-log/learning-log.md
 ```
 
-Use this skill only to capture durable learning from the visible Codex thread. Do not use it for historical backfills, external source ingestion, or knowledge-base retrieval.
+Set `LEARNING_LOG_ROOT` to keep private data elsewhere. The append helper and weekly publisher both use `<LEARNING_LOG_ROOT>/learning-log.md`. This package does not ingest external sources or provide a general knowledge-base search.
 
 ## Rules
 
-- Summarize only the visible Codex thread. Do not claim to have seen messages that are not in context.
+- In `log-thread`, summarize only the visible Codex thread. In `weekly-review`, use dated history evidence and disclose coverage limits.
 - Optimize for reusable knowledge, not chat chronology.
-- Render a draft first and wait for explicit confirmation before appending.
+- Render a draft before ordinary appends. Weekly automatic publication requires the owner's explicit authorization for that automation; a copied prompt or example is not authorization. Honor existing session approval without asking again.
 - Append through `scripts/append_learning_log.py`; do not edit `learning-log.md` directly.
-- If append fails because the log path is not writable, return the rendered draft and clearly say that no file was modified.
+- Use the supported scoped approval flow for a requested destination outside writable roots. If saving still fails, retain the draft and report what did or did not change.
+- Keep credentials, private paths, internal identifiers and raw transcripts out of shared examples. Generated reports remain private local data unless the user separately authorizes sharing.
 
-## Goal
+## `log-thread`
+
+### Goal
 
 Create a learning-log entry that preserves durable knowledge from the current thread.
 
@@ -117,4 +122,6 @@ Empty or low-value sections should render as `- None.`
 
 - This repository folder is only the local source copy of the skill.
 - The installed skill can be copied to `~/.codex/skills/thread-learning-log`.
-- The append helper defaults to `~/.codex/skills/thread-learning-log/learning-log.md`, so the log is stored beside the installed global skill.
+- `python3 thread-learning-log/scripts/install_global_skill.py` installs code without changing Codex permissions. It excludes private data, caches, generated website data and dependencies. Install the website dependencies separately as described in the weekly workflow.
+- The append helper defaults to `~/.codex/skills/thread-learning-log/learning-log.md`, or the configured `LEARNING_LOG_ROOT`. When that override is set, use it for tag discovery too.
+- An explicit `--writable-root` option retains the legacy opt-in permission configuration behavior; it is not needed for normal installation.

@@ -10,7 +10,7 @@ Link to the Github repository: [https://github.com/tuananhbui89/skills](https://
 
 | Skill | Use it when |
 | --- | --- |
-| [`thread-learning-log`](thread-learning-log/SKILL.md) | Turn the current Codex thread into a durable learning-log entry after confirmation. |
+| [`thread-learning-log`](thread-learning-log/SKILL.md) | Capture a lesson from the current chat, or run an authorized weekly review of completed work, ongoing tasks and reusable lessons. |
 | [`grill-me`](grill-me/SKILL.md) | Pressure-test a plan, proposal, or architecture through a decision-by-decision interview. |
 | [`ask-me-paper`](ask-me-paper/SKILL.md) | Test and deepen your understanding of a paper or article with one rigorous question at a time. |
 | [`tough-review`](tough-review/SKILL.md) | Review an ML/AI paper for critical weaknesses, including its appendix, one concern at a time. |
@@ -33,11 +33,36 @@ There is also a more personal reason: my memory is not especially reliable. If I
 
 The idea behind this skill is simple: ask an AI agent to review the session or thread we just worked through together and extract durable, reusable lessons that may be useful in the future. For example, after using Codex to read and discuss a research paper, I can ask it to capture the paper's main ideas, assumptions, and takeaways. Or, after solving a difficult bug, I can ask the skill to summarize the debugging path, the root cause, and the fix.
 
-The memory file will be a Markdown document. Each item or section represents one lesson, tagged with a timestamp and the related project or topic.
+The memory file is a Markdown document. Each entry represents one lesson, tagged with a timestamp and the related project or topic.
 
-To make the skill more useful, visible, and easy to revisit, I also want Codex to build a small website from the main memory Markdown file. The UI should look like the image below, inspired by GitHub's commit history. Seeing a daily record of what I have learned and solved should make it easier to return to the log regularly and encourage me to save at least one interesting lesson each day.
+To make the record visible and easy to revisit, the skill includes a local website built from the main memory Markdown file and weekly JSON snapshots. Its Lessons view retains a calendar and timeline inspired by GitHub's commit history, while the Weekly view groups completed tasks, work in progress and reusable lessons. Seeing a daily record of what I have learned and solved should make it easier to return to the log regularly and encourage me to save at least one interesting lesson each day.
 
-![Thread learning log UI](/images/thread-learning-log/mainui.png)
+![Thread learning log UI](images/thread-learning-log/mainui.png)
+
+### Weekly progress and lessons
+
+**Update: 23 November 2026.** Invoking a learning skill after every chat takes discipline, and I do not always keep up. The weekly workflow makes that habit easier: every Monday morning, Codex reviews the previous complete week's chats, including archived chats, and records what I completed, what remains in progress, and which lessons are worth keeping. I still need to revisit the lessons to learn from them; automation makes the record more consistent.
+
+This also gives me a concise history for personal reflection, year-end reviews and promotion preparation. Tasks are snapshots of that week's work. Durable lessons remain in the canonical Markdown log, and equivalent lessons are linked rather than copied again.
+
+The repository now includes:
+
+- A history scanner that uses message timestamps and a configurable timezone.
+- A validated publisher for `learning-log.md`, `weekly-progress.md` and `weeks/YYYY-MM-DD.json`, with stable lesson IDs and safe reruns.
+- A local website with Weekly and Lessons views, source links, expandable lessons and live refresh.
+- A reusable Monday 9 am automation prompt, with configurable private destinations and an explicit choice between automatic publication and review-first drafts.
+
+**Set up**
+
+Follow [the weekly workflow and configuration guide](thread-learning-log/references/weekly-review.md), then use [the automation prompt](thread-learning-log/references/automation-prompt.md) to create or update the schedule through Codex Automations. Installing or cloning this repository does not create a live schedule. For example:
+
+```text
+Use $thread-learning-log to set up a weekly review every Monday at 9 am in my timezone. Summarize completed and ongoing work, capture reusable lessons, and refresh the local website. Configure private output paths and enable automatic publication of well-supported lessons.
+```
+
+The scripts require Python 3.10+ on macOS or Linux; the website requires Node 22.18+ and npm. Automatic background website startup is provided for macOS; Linux users can run the website in a terminal or under their own service manager.
+
+The shared package contains code, instructions and synthetic test examples. Personal paths, reporting-chat identifiers, private reports and raw chat exports are not included. Runtime data, generated site assets, local environment files and dependencies are excluded from installation and version control. Generated reports still need a separate privacy review before sharing.
 
 ## Grill Me
 

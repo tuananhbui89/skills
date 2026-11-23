@@ -1,4 +1,4 @@
 interface:
   display_name: "Thread Learning Log"
-  short_description: "Log durable lessons from the current thread"
-  default_prompt: "Use $thread-learning-log to draft a knowledge-first learning entry for this thread, show it for confirmation, and append it to ~/.codex/skills/thread-learning-log/learning-log.md only after approval."
+  short_description: "Capture reusable lessons and review weekly progress"
+  default_prompt: "Use $thread-learning-log to capture reusable lessons from this chat, or review a requested week of Codex work with completed tasks, ongoing work and lessons. Follow the selected mode's approval rules."

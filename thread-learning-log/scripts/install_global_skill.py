@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install this skill into ~/.codex/skills and patch writable roots."""
+"""Install this skill; permission changes require an explicit --writable-root."""
 
 from __future__ import annotations
 
@@ -26,8 +26,7 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=None,
         help=(
-            "Writable root to add to Codex config. Defaults to the installed "
-            "thread-learning-log skill directory."
+            "Optional writable root to add to Codex config. No permission changes by default."
         ),
     )
     parser.add_argument(
@@ -124,7 +123,7 @@ def copy_skill(skill_dir: Path, target_dir: Path, dry_run: bool) -> None:
         skill_dir,
         target_dir,
         dirs_exist_ok=True,
-        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "node_modules", "dist", ".personal-memory", "reports", "learning-log.md", "site-data.json", "log-assets", ".env", ".env.*", "*.lock", "*.sqlite", "*.sqlite-*", "*.db", ".DS_Store"),
     )
 
 
@@ -134,7 +133,7 @@ def main() -> int:
     codex_home = args.codex_home
     target_skill_dir = codex_home / "skills" / skill_dir.name
     config_path = codex_home / "config.toml"
-    writable_root = args.writable_root or target_skill_dir
+    writable_root = args.writable_root
 
     try:
         if not codex_home.exists():
@@ -146,7 +145,8 @@ def main() -> int:
             sys.stdout.write(f"Writable root: {writable_root}\n")
 
         copy_skill(skill_dir, target_skill_dir, args.dry_run)
-        patch_config(config_path, writable_root, args.dry_run)
+        if writable_root is not None:
+            patch_config(config_path, writable_root, args.dry_run)
         if args.dry_run:
             sys.stdout.write("Dry run complete.\n")
         else:

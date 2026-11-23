@@ -4,16 +4,20 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
+import os
 import re
 import sys
+import tempfile
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
 
-DEFAULT_LOG_PATH = (
-    Path.home() / ".codex" / "skills" / "thread-learning-log" / "learning-log.md"
-)
+from weekly_config import ROOT
+
+DEFAULT_LOG_PATH = ROOT / "learning-log.md"
 METADATA_ORDER = [
     "entry_id",
     "date",
@@ -225,7 +229,7 @@ def normalize_payload(payload: dict) -> dict:
         for section_name in SECTION_ORDER
     }
 
-    return {
+    result = {
         "entry_id": entry_id,
         "date": date,
         "time_start": time_start,
@@ -241,6 +245,9 @@ def normalize_payload(payload: dict) -> dict:
         "title": title,
         "sections": normalized_sections,
     }
+    if payload.get("concept_key"):
+        result["concept_key"] = str(payload["concept_key"]).strip().lower()
+    return result
 
 
 def render_entry(entry: dict) -> str:
@@ -252,6 +259,8 @@ def render_entry(entry: dict) -> str:
     lines = [heading, ""]
     for key in METADATA_ORDER:
         lines.append(f"{key}: {json.dumps(entry[key], ensure_ascii=True)}")
+    if entry.get("concept_key"):
+        lines.append(f"concept_key: {json.dumps(entry['concept_key'])}")
     for section_name in SECTION_ORDER:
         lines.extend(["", f"### {section_name}", entry["sections"][section_name]])
     return "\n".join(lines).rstrip() + "\n"
@@ -270,11 +279,45 @@ def ensure_root_heading(existing_text: str) -> str:
     return "# Learning Log\n\n" + existing_text.lstrip()
 
 
+@contextmanager
+def file_lock(path: Path):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('a') as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle, fcntl.LOCK_UN)
+
+
+def atomic_write(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix='.' + path.name + '-', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary, path.stat().st_mode & 0o777 if path.exists() else 0o600)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
 def append_entry(log_path: Path, rendered_entry: str) -> None:
-    existing_text = log_path.read_text(encoding="utf-8") if log_path.exists() else ""
-    base_text = ensure_root_heading(existing_text).rstrip()
-    final_text = f"{base_text}\n\n{rendered_entry.rstrip()}\n"
-    log_path.write_text(final_text, encoding="utf-8")
+    match = re.search(r'^entry_id:\s*(.+)$', rendered_entry, re.M)
+    if not match:
+        raise ValueError('Rendered entry must have an entry_id')
+    entry_id = json.loads(match.group(1))
+    with file_lock(log_path.with_name('.' + log_path.name + '.lock')):
+        existing_text = log_path.read_text(encoding='utf-8') if log_path.exists() else ''
+        ids = [json.loads(value) for value in re.findall(r'^entry_id:\s*(.+)$', existing_text, re.M)]
+        if entry_id in ids:
+            return  # Preserve the existing entry, including any manual edits.
+        base_text = ensure_root_heading(existing_text)
+        separator = '' if base_text.endswith('\n\n') else '\n' if base_text.endswith('\n') else '\n\n'
+        atomic_write(log_path, base_text + separator + rendered_entry.rstrip() + '\n')
 
 
 def main() -> int:
